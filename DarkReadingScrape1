@@ -1,0 +1,35 @@
+import csv
+import requests
+from bs4 import BeautifulSoup
+
+
+# Create a list of URLs to scrape
+urls = ['https://www.darkreading.com/attacks-breaches', 'https://www.darkreading.com/threat-intelligence', 'https://www.darkreading.com/endpoint']
+
+# Initialize an empty list to store the articles
+articles = []
+
+# Loop through the URLs
+for url in urls:
+    # Make a request to the website
+    response = requests.get(url)
+
+    # Parse the HTML content
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Extract the information you want from the website
+    for article in soup.find_all('div', class_='article-right ml-4 d-flex'):
+        articles.append(article.text)
+
+articles.sort(key=lambda x: x.title())
+
+# Write the extracted information to a CSV file
+with open('scrape/DarkReading.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(["Article Titles"])
+    if articles: 
+        for title in articles:
+            writer.writerow([title + "\n"])
+        print("Articles have been written to the csv file")
+    else: 
+        print("No articles have been found")
